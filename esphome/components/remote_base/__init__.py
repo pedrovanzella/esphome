@@ -511,6 +511,45 @@ async def dish_action(var, config, args):
     cg.add(var.set_command(template_))
 
 
+# Dooya
+DooyaData, DooyaBinarySensor, DooyaTrigger, DooyaAction, DooyaDumper = declare_protocol(
+    "Dooya"
+)
+DOOYA_SCHEMA = cv.Schema(
+    {
+        cv.Optional(CONF_ADDRESS): cv.int_range(min=0, max=0xFFFF),
+        cv.Optional(CONF_CHANNEL): cv.int_range(min=1, max=16),
+    }
+)
+
+@register_binary_sensor("dooya", DooyaBinarySensor, DOOYA_SCHEMA)
+def dooya_binary_sensor(var, config):
+    cg.add(
+        var.set_data(
+            cg.StructInitializer(
+                DooyaData,
+                ("address", config[CONF_ADDRESS]),
+                ("channel", config[CONF_CHANNEL]),
+            )
+        )
+    )
+
+@register_trigger("dooya", DooyaTrigger, DooyaData)
+def dooya_trigger(var, config):
+    pass
+
+@register_dumper("dooya", DooyaDumper)
+def dooya_dumper(var, config):
+    pass
+
+@register_action("dooya", DooyaAction, DOOYA_SCHEMA)
+async def dooya_action(var, config, args):
+    template_ = await cg.templatable(config[CONF_ADDRESS], args, cg.uint16)
+    cg.add(var.set_address(template_))
+    template_ = await cg.templatable(config[CONF_CHANNEL], args, cg.uint8)
+    cg.add(var.set_channel(template_))
+
+
 # JVC
 JVCData, JVCBinarySensor, JVCTrigger, JVCAction, JVCDumper = declare_protocol("JVC")
 JVC_SCHEMA = cv.Schema({cv.Required(CONF_DATA): cv.hex_uint32_t})
