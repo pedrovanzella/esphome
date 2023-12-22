@@ -14,10 +14,10 @@ void DooyaProtocol::encode(RemoteTransmitData *dst, const DooyaData &data) {}
 
 optional<DooyaData> DooyaProtocol::decode(RemoteReceiveData data) {
   const auto size = data.size();
-  if (size != 40) {
+  /* if (size != 40) {
     ESP_LOGW(TAG, "Invalid Dooya frame size: %d", size);
     return {};
-  }
+  } */
   DooyaData result;
 
   for (int i = 0; i < 24; i++) {
