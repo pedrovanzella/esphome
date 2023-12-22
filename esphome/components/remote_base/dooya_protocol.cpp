@@ -12,7 +12,7 @@ bool DooyaData::operator==(const DooyaData &other) const {
 
 void DooyaProtocol::encode(RemoteTransmitData *dst, const DooyaData &data) {}
 
-optional<DooyaData> DooyaProtocol::decode(RemoteReceiveData data) {
+static optional<DooyaData> decode_frame(RemoteReceiveData data) {
   const auto size = data.size();
   if (size != 40) {
     ESP_LOGW(TAG, "Invalid Dooya frame size: %d", size);
@@ -34,6 +34,19 @@ optional<DooyaData> DooyaProtocol::decode(RemoteReceiveData data) {
     result.action = (result.action << 1) | data[i];
   }
 
+  return result;
+}
+
+optional<DooyaData> DooyaProtocol::decode(RemoteReceiveData data) {
+  if (data.size() != 40) {
+    ESP_LOGW(TAG, "Invalid Dooya frame size: %d", data.size());
+    return {};
+  }
+  const auto result = decode_frame(data);
+  if (!result) {
+    ESP_LOGW(TAG, "Invalid Dooya frame");
+    return {};
+  }
   return result;
 }
 

@@ -33,7 +33,7 @@ template<typename... Ts> class DooyaAction : public RemoteTransmitterActionBase<
   TEMPLATABLE_VALUE(uint8_t, channel)
   TEMPLATABLE_VALUE(uint8_t, action)
   void encode(RemoteTransmitData *dst, Ts... x) {
-    DooyaProtocol().encode(dst, {this->address.value(x...), this->multi_.value(x...),
+    DooyaProtocol().encode(dst, {this->address_.value(x...), this->multi_.value(x...),
                                  this->channel_.value(x...), this->action_.value(x...)});
   }
 };
