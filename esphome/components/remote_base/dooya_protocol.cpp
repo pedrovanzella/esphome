@@ -12,11 +12,14 @@ bool DooyaData::operator==(const DooyaData &other) const {
 
 void DooyaProtocol::encode(RemoteTransmitData *dst, const DooyaData &data) {}
 
-optional<DooyaData> DooyaProtocol::decode(RemoteReceiveData data) {
-  return {};
-}
+optional<DooyaData> DooyaProtocol::decode(RemoteReceiveData data) { return {}; }
 
-void DooyaProtocol::dump(const DooyaData &data) {}
+void DooyaProtocol::dump(const DooyaData &data) {
+  ESP_LOGI(TAG,
+           "Received Dooya: action=%" PRIu32 ", address=%" PRIu32 ", single_multi=%" PRIu8 ", channel=%" PRIu8
+           ", key=%" PRIu8,
+           data.action, data.address, data.single_multi, data.channel, data.key);
+}
 
 }  // namespace remote_base
 }  // namespace esphome
