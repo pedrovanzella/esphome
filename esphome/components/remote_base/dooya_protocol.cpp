@@ -5,6 +5,13 @@ namespace esphome {
 namespace remote_base {
 static const char *const TAG = "remote.dooya";
 
+static const uint32_t BIT_ONE_HIGH_US = 700;
+static const uint32_t BIT_ONE_LOW_US = 300;
+static const uint32_t BIT_ZERO_HIGH_US = 300;
+static const uint32_t BIT_ZERO_LOW_US = 700;
+static const uint32_t HEADER_HIGH_US = 4500;
+static const uint32_t HEADER_LOW_US = 1400;
+
 bool DooyaData::operator==(const DooyaData &other) const {
   return this->address == other.address && this->multi == other.multi && this->channel == other.channel &&
          this->action == other.action;
