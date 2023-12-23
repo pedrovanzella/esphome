@@ -67,8 +67,8 @@ optional<DooyaData> DooyaProtocol::decode(RemoteReceiveData data) {
 }
 
 void DooyaProtocol::dump(const DooyaData &data) {
-  ESP_LOGI(TAG, "Received Dooya: address=%" PRIu32 ", multi=%" PRIu8 ", channel=%" PRIu8 ", action=%" PRIu8,
-           data.address, data.multi, data.channel, data.action);
+  ESP_LOGI(TAG, "Received Dooya: address=%x, multi=%x, channel=%x, action=%x", data.address, data.multi, data.channel,
+           data.action);
 }
 
 }  // namespace remote_base
