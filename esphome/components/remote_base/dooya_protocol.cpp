@@ -19,7 +19,7 @@ bool DooyaData::operator==(const DooyaData &other) const {
 
 void DooyaProtocol::encode(RemoteTransmitData *dst, const DooyaData &data) {}
 
-static boolean get_bit(RemoteReceiveData data) {
+static bool get_bit(RemoteReceiveData data) {
   if (data.peek_mark(BIT_ONE_HIGH_US) && data.peek_space(BIT_ONE_LOW_US)) {
     data.advance(2);
     return true;
@@ -47,8 +47,7 @@ optional<DooyaData> DooyaProtocol::decode(RemoteReceiveData data) {
 
   // multi
   for (int i = 0; i < 4; i++) {
-    out.multi <<= 1UL;
-    out.multi |= get_bit(data);
+    out.multi = get_bit(data);
   }
 
   // channel
