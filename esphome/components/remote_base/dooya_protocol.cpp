@@ -19,42 +19,51 @@ bool DooyaData::operator==(const DooyaData &other) const {
 
 void DooyaProtocol::encode(RemoteTransmitData *dst, const DooyaData &data) {}
 
-static optional<DooyaData> decode_frame(RemoteReceiveData data) {
-  const auto size = data.size();
-  if (size != 40) {
-    ESP_LOGW(TAG, "Invalid Dooya frame size: %d", size);
-    return {};
+static boolean get_bit(RemoteReceiveData data) {
+  if (data.peek_mark(BIT_ONE_HIGH_US) && data.peek_space(BIT_ONE_LOW_US)) {
+    data.advance(2);
+    return true;
   }
-  DooyaData result;
-
-  for (int i = 0; i < 24; i++) {
-    result.address = (result.address << 1) | data[i];
+  if (data.peek_mark(BIT_ZERO_HIGH_US) && data.peek_space(BIT_ZERO_LOW_US)) {
+    data.advance(2);
+    return false;
   }
-  for (int i = 24; i < 28; i++) {
-    result.multi = (result.multi << 1) | data[i];
-  }
-  result.multi = result.multi == 1;
-  for (int i = 28; i < 32; i++) {
-    result.channel = (result.channel << 1) | data[i];
-  }
-  for (int i = 32; i < 40; i++) {
-    result.action = (result.action << 1) | data[i];
-  }
-
-  return result;
+  return false;
 }
 
 optional<DooyaData> DooyaProtocol::decode(RemoteReceiveData data) {
-  if (data.size() != 40) {
-    ESP_LOGW(TAG, "Invalid Dooya frame size: %d", data.size());
+  DooyaData out;
+
+  // Sync pulse
+  if (!data.expect_pulse_with_gap(HEADER_HIGH_US, HEADER_LOW_US)) {
     return {};
   }
-  const auto result = decode_frame(data);
-  if (!result) {
-    ESP_LOGW(TAG, "Invalid Dooya frame");
-    return {};
+
+  // address
+  for (int i = 0; i < 24; i++) {
+    out.address <<= 1UL;
+    out.address |= get_bit(data);
   }
-  return result;
+
+  // multi
+  for (int i = 0; i < 4; i++) {
+    out.multi <<= 1UL;
+    out.multi |= get_bit(data);
+  }
+
+  // channel
+  for (int i = 0; i < 4; i++) {
+    out.channel <<= 1UL;
+    out.channel |= get_bit(data);
+  }
+
+  // action
+  for (int i = 0; i < 8; i++) {
+    out.action <<= 1UL;
+    out.action |= get_bit(data);
+  }
+
+  return out;
 }
 
 void DooyaProtocol::dump(const DooyaData &data) {
